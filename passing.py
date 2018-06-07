@@ -197,7 +197,9 @@ def scanner(source_code):
                 elif current_state==80:
                     current_str+=char
                     if char=='\\':
-                        pass
+                        current_str+=current_line[current_char_index+1]
+                        current_char_index+=2
+                        continue
                     elif char!="'":
                         current_char_index+=1
                         continue
@@ -209,7 +211,11 @@ def scanner(source_code):
                         continue
                 elif current_state==81:
                     current_str+=char
-                    if char!='"':
+                    if char=='\\':
+                        current_str+=current_line[current_char_index+1]
+                        current_char_index+=2
+                        continue
+                    elif char!='"':
                         current_char_index+=1
                     else:
                         token_list.append(current_str)
