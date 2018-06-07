@@ -154,28 +154,17 @@ def scanner(source_code):
                         current_char_index+=1
                         continue
                     elif current_line[current_char_index+1] in SPECIAL_SYMBOL and current_line[current_char_index+1]!="(":
-                        print("ERROR!:Except an ( after main,but get illegal symbol. in line {0},word {1}".format(source_code.index(current_line_),current_char_index))
-                        error=1
-                        break
-                    elif current_line[current_char_index+1]==" " or current_line[current_char_index+1]=="\n":
-                        current_char_index+=1
-                        current_state=30
-                        continue
-                elif current_state==30:
-                    if char=="\n" or char==" ":
-                        current_char_index+=1
-                        continue
-                    elif char=="(":
                         token_list.append(current_str)
                         current_str=""
-                        token_list.append("(")
                         current_char_index+=1
                         token_state=-1
                         continue
-                    else:
-                        print("ERROR!:Except an ( after main,but get illegal symbol. in line {0},word {1}".format(source_code.index(current_line_),current_char_index))
-                        error=1
-                        break
+                    elif current_line[current_char_index+1]==" " or current_line[current_char_index+1]=="\n":
+                        token_list.append(current_str)
+                        current_str=""
+                        current_char_index+=1
+                        token_state=-1
+                        continue
                 #handling "if","else","while","main","read" end
                     
                 elif current_state==4:
@@ -207,8 +196,11 @@ def scanner(source_code):
                         continue
                 elif current_state==80:
                     current_str+=char
-                    if char!="'":
+                    if char=='\\':
+                        pass
+                    elif char!="'":
                         current_char_index+=1
+                        continue
                     else:
                         token_list.append(current_str)
                         current_str=""
