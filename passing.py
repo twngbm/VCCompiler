@@ -97,27 +97,43 @@ def scanner(source_code):
                     current_str+=char
                     #print(current_str)
                     if current_str in ID:
-                        pass
+                        current_state=1
+                        continue
                     elif current_str in RESERVED_WORD:
                         if current_str in TYPE_DECLARATION_WORD:
-                            pass
+                            current_state=2
+                            continue
+
+                        #handling "if","else","while","main","read"
                         elif current_str in STRUCTURE_WORD:
                             current_state=3
                             continue
+                        #handling "if","else","while","main","read" end
+
                         elif current_str in BOOL_WORD:
-                            pass
+                            current_state=4
+                            continue
                     elif current_str in SPECIAL_SYMBOL:
                         if current_str in OPERATOR_SYMBOL:
-                            pass
+                            current_state=5
+                            continue
                         elif current_str in ASSIGNMENT_SYMBOL:
-                            pass
+                            current_state=6
+                            continue
                         elif current_str in COMPARE_SYMBOL:
-                            pass
+                            current_state=7
+                            continue
                         elif current_str in STRUCTURE_SYMBOL:
                             current_state=8
                             continue
                     else:
                        current_char_index+=1
+                elif current_state==1:
+                    pass
+                elif current_state==2:
+                    pass
+
+                #handling "if","else","while","main","read"
                 elif current_state==3:
                     if current_line[current_char_index+1]=="(":
                         token_list.append(current_str)
@@ -153,8 +169,20 @@ def scanner(source_code):
                         print("ERROR!:Except an ( after main,but get illegal symbol. in line {0},word {1}".format(source_code.index(current_line_),current_char_index))
                         error=1
                         break
+                #handling "if","else","while","main","read" end
+                    
+                elif current_state==4:
+                    pass
+                elif current_state==5:
+                    pass
+                elif current_state==5:
+                    pass
+                elif current_state==6:
+                    pass
+                elif current_state==7:
+                    pass
                 elif current_state==8:
-                    if current_str!="\'" and current_str!="\"":
+                    if current_str!="'" and current_str!='"':
                         token_list.append(current_str)
                         current_str=""
                         current_char_index+=1

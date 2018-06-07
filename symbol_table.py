@@ -6,7 +6,7 @@ RESERVED_WORD=TYPE_DECLARATION_WORD+STRUCTURE_WORD+BOOL_WORD
 OPERATOR_SYMBOL=["+","-","*","/","%"]
 ASSIGNMENT_SYMBOL=["="]
 COMPARE_SYMBOL=["<","<=",">",">=","==","!="]
-STRUCTURE_SYMBOL=["(",")","{","}",",",";","\'","\""]
+STRUCTURE_SYMBOL=["(",")","{","}",",",";","'",'"']
 SPECIAL_SYMBOL=OPERATOR_SYMBOL+ASSIGNMENT_SYMBOL+COMPARE_SYMBOL+STRUCTURE_SYMBOL
 LETTER=list(string.ascii_letters)#A~Z,a~z
 DIGITS=list(string.digits)#0~9

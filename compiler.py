@@ -2,7 +2,6 @@ import time
 from passing import *
 
 
-print(PROLOGUE)
 time1=time.time()
 
 print("This is a vanilla c compiler.\n")
