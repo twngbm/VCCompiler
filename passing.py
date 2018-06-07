@@ -11,17 +11,14 @@ def scanner(source_code):
     
     token_state=-1       #-1=undetermind token,0=command token,1=RESERVED_WORD,ID token,SPECIAL_SYMBOL
     error=0
-    EOL=0
     token_list=[]
-    total_line=len(source_code)
-    current_line_index=0
     current_str=""
 
     for current_line_ in source_code:
         
         current_line=list(current_line_)
         current_char_index=0
-        
+        print("char_split: ",current_line)
         #handing error
         if error!=0:
             break
@@ -65,8 +62,9 @@ def scanner(source_code):
                     current_state=0
                     continue
                 #handing normal token end 
-                    
-                else: #tempory handling none handling char
+
+                #tempory handling none handling char    
+                else: 
                     current_char_index+=1
                     continue
             #handling un-stated token end
@@ -87,8 +85,7 @@ def scanner(source_code):
                         current_char_index+=2
                         token_state=-1
                     else:
-                        current_char_index+=1
-                        
+                        current_char_index+=1             
             #handling comment end
 
             #handing normal token
@@ -100,9 +97,12 @@ def scanner(source_code):
                         current_state=1
                         continue
                     elif current_str in RESERVED_WORD:
+
+                        #habdling "bool","char","const","string","int"
                         if current_str in TYPE_DECLARATION_WORD:
                             current_state=2
                             continue
+                        #habdling "bool","char","const","string","int" end
 
                         #handling "if","else","while","main","read"
                         elif current_str in STRUCTURE_WORD:
@@ -123,15 +123,22 @@ def scanner(source_code):
                         elif current_str in COMPARE_SYMBOL:
                             current_state=7
                             continue
+
+                        #habdling "(",")","{","}",",",";" symbol and string token
                         elif current_str in STRUCTURE_SYMBOL:
                             current_state=8
                             continue
+                        #habdling "(",")","{","}",",",";" symbol and string token end
+
                     else:
                        current_char_index+=1
                 elif current_state==1:
                     pass
+
+                #habdling "bool","char","const","string","int"
                 elif current_state==2:
                     pass
+                #habdling "bool","char","const","string","int" end
 
                 #handling "if","else","while","main","read"
                 elif current_state==3:
@@ -181,6 +188,8 @@ def scanner(source_code):
                     pass
                 elif current_state==7:
                     pass
+
+                #habdling "(",")","{","}",",",";" symbol and string token
                 elif current_state==8:
                     if current_str!="'" and current_str!='"':
                         token_list.append(current_str)
@@ -188,11 +197,35 @@ def scanner(source_code):
                         current_char_index+=1
                         token_state=-1
                         continue
+                    elif current_str=="'":
+                        current_state=80
+                        current_char_index+=1
+                        continue
+                    elif current_str=='"':
+                        current_state=81
+                        current_char_index+=1
+                        continue
+                elif current_state==80:
+                    current_str+=char
+                    if char!="'":
+                        current_char_index+=1
                     else:
-                        pass
-
-
-
+                        token_list.append(current_str)
+                        current_str=""
+                        current_char_index+=1
+                        token_state=-1
+                        continue
+                elif current_state==81:
+                    current_str+=char
+                    if char!='"':
+                        current_char_index+=1
+                    else:
+                        token_list.append(current_str)
+                        current_str=""
+                        current_char_index+=1
+                        token_state=-1
+                        continue
+                #habdling "(",")","{","}",",",";" symbol and string token end
             #handing normal token end 
 
     return token_list

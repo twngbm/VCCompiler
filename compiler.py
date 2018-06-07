@@ -16,7 +16,7 @@ f.close()
 print("source code:\n")
 for i in source_code:
     print("{0}:   ".format(source_code.index(i)+1),i,end='')
-
+print("\n\nend of source code.\n")
 
 token_list=scanner(source_code)
 
@@ -24,7 +24,8 @@ if type(token_list)!=list:
     print("error")
     exit()
 
-print("\n",token_list)
+for i in token_list:
+    print("\n",i)
 
 syntax_tree=syntax_analyzer(token_list)
 if syntax_tree!=Tree:
