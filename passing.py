@@ -8,6 +8,12 @@ class Tree(object):
         self.data=None
 
 def scanner(source_code):
+    def current_char_index_plus_one():
+        try:
+            next_char=current_line[current_char_index+1]
+        except:
+            next_char="\n"
+        return next_char
     
     token_state=-1       #-1=undetermind token,0=command token,1=RESERVED_WORD,ID token,SPECIAL_SYMBOL
     error=0
@@ -19,6 +25,7 @@ def scanner(source_code):
         current_line=list(current_line_)
         current_char_index=0
         print("char_split: ",current_line)
+
         #handing error
         if error!=0:
             break
@@ -44,12 +51,12 @@ def scanner(source_code):
                
                 #handling comment
                 if char=="/": 
-                    if current_line[current_char_index+1]=="/":#"//"type of comment
+                    if current_char_index_plus_one()=="/":#"//"type of comment
                         current_char_index+=2
                         comment_type=1
                         token_state=0
                         continue
-                    elif current_line[current_char_index+1]=="*":#"/*...*/"type of comment
+                    elif current_char_index_plus_one()=="*":#"/*...*/"type of comment
                         current_char_index+=2
                         comment_type=2
                         token_state=0
@@ -81,7 +88,7 @@ def scanner(source_code):
                 elif comment_type==2:#"/*...*/"type of comment
                     if char=="\n":
                         break
-                    elif char=="*" and current_line[current_char_index+1]=="/":
+                    elif char=="*" and current_char_index_plus_one()=="/":
                         current_char_index+=2
                         token_state=-1
                     else:
@@ -142,24 +149,24 @@ def scanner(source_code):
 
                 #handling "if","else","while","main","read"
                 elif current_state==3:
-                    if current_line[current_char_index+1]=="(":
+                    if current_char_index_plus_one()=="(":
                         token_list.append(current_str)
                         current_str=""
                         token_list.append("(")
                         current_char_index+=2
                         token_state=-1
                         continue
-                    elif current_line[current_char_index+1] in LETTER or current_line[current_char_index+1] in DIGITS:
+                    elif current_char_index_plus_one() in LETTER or current_char_index_plus_one() in DIGITS:
                         current_state=0
                         current_char_index+=1
                         continue
-                    elif current_line[current_char_index+1] in SPECIAL_SYMBOL and current_line[current_char_index+1]!="(":
+                    elif current_char_index_plus_one() in SPECIAL_SYMBOL and current_char_index_plus_one()!="(":
                         token_list.append(current_str)
                         current_str=""
                         current_char_index+=1
                         token_state=-1
                         continue
-                    elif current_line[current_char_index+1]==" " or current_line[current_char_index+1]=="\n":
+                    elif current_char_index_plus_one()==" " or current_char_index_plus_one()=="\n":
                         token_list.append(current_str)
                         current_str=""
                         current_char_index+=1
@@ -174,7 +181,18 @@ def scanner(source_code):
                 elif current_state==5:
                     pass
                 elif current_state==6:
-                    pass
+                    if current_char_index_plus_one()!="=":
+                        current_char_index+=1
+                        token_list.append(current_str)
+                        current_str=""
+                        token_state=-1
+                        continue
+                    else:
+                        current_char_index+=2
+                        token_list.append("==")
+                        current_str=""
+                        token_list=-1
+                        continue
                 elif current_state==7:
                     pass
 
@@ -196,8 +214,11 @@ def scanner(source_code):
                         continue
                 elif current_state==80:
                     current_str+=char
-                    if char=='\\':
-                        current_str+=current_line[current_char_index+1]
+                    if char=="\n":
+                        print("Error, string end without an ' ")
+                        return 0
+                    elif char=='\\':
+                        current_str+=current_char_index_plus_one()
                         current_char_index+=2
                         continue
                     elif char!="'":
@@ -211,22 +232,28 @@ def scanner(source_code):
                         continue
                 elif current_state==81:
                     current_str+=char
-                    if char=='\\':
-                        current_str+=current_line[current_char_index+1]
+                    if char=="\n":
+                        print("Error, string end without an \" ")
+                        return 0
+                    elif char=='\\':
+                        current_str+=current_char_index_plus_one()
                         current_char_index+=2
                         continue
                     elif char!='"':
                         current_char_index+=1
+                        continue
                     else:
                         token_list.append(current_str)
                         current_str=""
                         current_char_index+=1
                         token_state=-1
                         continue
+
                 #habdling "(",")","{","}",",",";" symbol and string token end
             #handing normal token end 
 
     return token_list
+
 
 def syntax_analyzer(token_list):
     syntax_tree=Tree
