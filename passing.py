@@ -19,8 +19,14 @@ def scanner(source_code):
     error=0
     token_list=[]
     current_str=""
-
+    source_code_len=len(source_code)
+    if source_code_len==0:
+        return 0
+    current_line_index=0
     for current_line_ in source_code:
+        current_line_index+=1
+        if current_line_index>=source_code_len:
+            current_line_+="\n"
         
         current_line=list(current_line_)
         current_char_index=0
@@ -28,7 +34,7 @@ def scanner(source_code):
 
         #handing error
         if error!=0:
-            break
+            return -1
         #handing error end
 
         while current_char_index<len(current_line):
@@ -37,13 +43,16 @@ def scanner(source_code):
             
             #handling error
             if error!=0:
-                token_list=-1
-                break
+                return -1
             #handling error end
 
             #handling un-stated token
             if token_state==-1:
 
+                if char=="\\":
+                    error=1
+                    print("Stray \\ in program")
+                    break
                 #handling EOL
                 if char=="\n":
                     break
