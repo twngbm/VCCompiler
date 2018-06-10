@@ -1,5 +1,5 @@
 from symbol_table import *
-ID=[]
+
 
 class Tree(object):
     def __init__(self):
@@ -8,12 +8,9 @@ class Tree(object):
         self.data=None
 
 def scanner(source_code):
-    def current_char_index_plus_one():
-        try:
-            next_char=current_line[current_char_index+1]
-        except:
-            next_char="\n"
-        return next_char
+    ID=[]
+    def get_next_char():
+        return current_line[current_char_index+1]
     
     token_state=-1       #-1=undetermind token,0=command token,1=RESERVED_WORD,ID token,SPECIAL_SYMBOL
     error=0
@@ -21,7 +18,8 @@ def scanner(source_code):
     current_str=""
     source_code_len=len(source_code)
     if source_code_len==0:
-        return 0
+        print("Error,Empty source code")
+        return 0,0
     current_line_index=0
     for current_line_ in source_code:
         current_line_index+=1
@@ -29,12 +27,13 @@ def scanner(source_code):
             current_line_+="\n"
         
         current_line=list(current_line_)
+        current_line=[w.replace("\t"," ") for w in current_line]
         current_char_index=0
-        print("char_split: ",current_line)
+        #print("char_split: ",current_line)
 
         #handing error
         if error!=0:
-            return -1
+            return -1,0
         #handing error end
 
         while current_char_index<len(current_line):
@@ -43,7 +42,7 @@ def scanner(source_code):
             
             #handling error
             if error!=0:
-                return -1
+                return -1,0
             #handling error end
 
             #handling un-stated token
@@ -60,12 +59,12 @@ def scanner(source_code):
                
                 #handling comment
                 if char=="/": 
-                    if current_char_index_plus_one()=="/":#"//"type of comment
+                    if get_next_char()=="/":#"//"type of comment
                         current_char_index+=2
                         comment_type=1
                         token_state=0
                         continue
-                    elif current_char_index_plus_one()=="*":#"/*...*/"type of comment
+                    elif get_next_char()=="*":#"/*...*/"type of comment
                         current_char_index+=2
                         comment_type=2
                         token_state=0
@@ -73,7 +72,7 @@ def scanner(source_code):
                 #handling comment end
 
                 #handing normal token
-                if char in ALL_CHAR:
+                if char in ALL_CHAR or char=="!":#handling != but ! not in SPECIAL_SYMBOL
                     token_state=1
                     current_state=0
                     continue
@@ -97,7 +96,7 @@ def scanner(source_code):
                 elif comment_type==2:#"/*...*/"type of comment
                     if char=="\n":
                         break
-                    elif char=="*" and current_char_index_plus_one()=="/":
+                    elif char=="*" and get_next_char()=="/":
                         current_char_index+=2
                         token_state=-1
                     else:
@@ -106,28 +105,17 @@ def scanner(source_code):
 
             #handing normal token
             if token_state==1:
+
+                #handling char or string not a token yet
                 if current_state==0:
                     current_str+=char
                     #print(current_str)
-                    if current_str in ID:
-                        current_state=1
-                        continue
-                    elif current_str in RESERVED_WORD:
-
-                        #habdling "bool","char","const","string","int"
-                        if current_str in TYPE_DECLARATION_WORD:
+                    if get_next_char() in SPECIAL_SYMBOL or get_next_char()==" " or get_next_char()=="\n":
+                        if current_str not in RESERVED_WORD and current_str not in SPECIAL_SYMBOL and current_str not in DIGITS:
+                            current_state=1
+                            continue
+                    if current_str in RESERVED_WORD:
                             current_state=2
-                            continue
-                        #habdling "bool","char","const","string","int" end
-
-                        #handling "if","else","while","main","read"
-                        elif current_str in STRUCTURE_WORD:
-                            current_state=3
-                            continue
-                        #handling "if","else","while","main","read" end
-
-                        elif current_str in BOOL_WORD:
-                            current_state=4
                             continue
                     elif current_str in SPECIAL_SYMBOL:
                         if current_str in OPERATOR_SYMBOL:
@@ -136,61 +124,57 @@ def scanner(source_code):
                         elif current_str in ASSIGNMENT_SYMBOL:
                             current_state=6
                             continue
-                        elif current_str in COMPARE_SYMBOL:
+                        elif current_str in COMPARE_SYMBOL or current_str=="!":
                             current_state=7
                             continue
-
-                        #habdling "(",")","{","}",",",";" symbol and string token
                         elif current_str in STRUCTURE_SYMBOL:
                             current_state=8
                             continue
-                        #habdling "(",")","{","}",",",";" symbol and string token end
-
+                    elif current_str in DIGITS:
+                        current_state=9
+                        continue
                     else:
                        current_char_index+=1
+                #handling char or string not a token yet end
+
+                #handling ID
                 elif current_state==1:
-                    pass
+                    token_list.append(current_str)
+                    if current_str not in ID:
+                        ID.append(current_str)
+                    current_str=""
+                    token_state=-1
+                    current_char_index+=1
+                    continue
+                #handling ID end
 
-                #habdling "bool","char","const","string","int"
+                #habdling RESERVED_WORD
                 elif current_state==2:
-                    pass
-                #habdling "bool","char","const","string","int" end
-
-                #handling "if","else","while","main","read"
-                elif current_state==3:
-                    if current_char_index_plus_one()=="(":
+                    if get_next_char()==" " or get_next_char()=="\n" or get_next_char() in SPECIAL_SYMBOL:
                         token_list.append(current_str)
                         current_str=""
-                        token_list.append("(")
-                        current_char_index+=2
+                        current_char_index+=1
                         token_state=-1
                         continue
-                    elif current_char_index_plus_one() in LETTER or current_char_index_plus_one() in DIGITS:
+                    elif get_next_char() in LETTER or get_next_char() in DIGITS:
                         current_state=0
                         current_char_index+=1
                         continue
-                    elif current_char_index_plus_one() in SPECIAL_SYMBOL and current_char_index_plus_one()!="(":
-                        token_list.append(current_str)
-                        current_str=""
-                        current_char_index+=1
-                        token_state=-1
-                        continue
-                    elif current_char_index_plus_one()==" " or current_char_index_plus_one()=="\n":
-                        token_list.append(current_str)
-                        current_str=""
-                        current_char_index+=1
-                        token_state=-1
-                        continue
-                #handling "if","else","while","main","read" end
-                    
-                elif current_state==4:
-                    pass
+
+                #habdling RESERVED_WORD end
+                
+                #handling "+","-","*","/","%"
                 elif current_state==5:
-                    pass
-                elif current_state==5:
-                    pass
+                    token_list.append(current_str)
+                    current_str=""
+                    current_char_index+=1
+                    token_state=-1
+                    continue
+                #handling "+","-","*","/","%" end
+
+                #handling = and ==
                 elif current_state==6:
-                    if current_char_index_plus_one()!="=":
+                    if get_next_char()!="=":
                         current_char_index+=1
                         token_list.append(current_str)
                         current_str=""
@@ -200,10 +184,38 @@ def scanner(source_code):
                         current_char_index+=2
                         token_list.append("==")
                         current_str=""
-                        token_list=-1
+                        token_state=-1
                         continue
+                #handling = and == end
+                
+                #handling "<","<=",">",">=","==","!="
                 elif current_state==7:
-                    pass
+                    if current_str=="!":
+                        if get_next_char()=="=":
+                            token_list.append("!=")
+                            current_str=""
+                            token_state=-1
+                            current_char_index+=2
+                            continue
+                        else:
+                            print("Get ! without =.")
+                            error=1
+                            break
+                    else:
+                        if get_next_char()=="=":
+                            current_str+="="
+                            token_list.append(current_str)
+                            current_str=""
+                            current_char_index+=2
+                            token_state=-1
+                            continue
+                        else:
+                            token_list.append(current_str)
+                            current_str=""
+                            current_char_index+=1
+                            token_state=-1
+                            continue
+                #handling "<","<=",">",">=","==","!=" end
 
                 #habdling "(",")","{","}",",",";" symbol and string token
                 elif current_state==8:
@@ -225,9 +237,9 @@ def scanner(source_code):
                     current_str+=char
                     if char=="\n":
                         print("Error, string end without an ' ")
-                        return 0
+                        return 0,0
                     elif char=='\\':
-                        current_str+=current_char_index_plus_one()
+                        current_str+=get_next_char()
                         current_char_index+=2
                         continue
                     elif char!="'":
@@ -243,9 +255,9 @@ def scanner(source_code):
                     current_str+=char
                     if char=="\n":
                         print("Error, string end without an \" ")
-                        return 0
+                        return 0,0
                     elif char=='\\':
-                        current_str+=current_char_index_plus_one()
+                        current_str+=get_next_char()
                         current_char_index+=2
                         continue
                     elif char!='"':
@@ -257,11 +269,27 @@ def scanner(source_code):
                         current_char_index+=1
                         token_state=-1
                         continue
-
                 #habdling "(",")","{","}",",",";" symbol and string token end
-            #handing normal token end 
 
-    return token_list
+                #handling DIGITS
+                elif current_state==9:
+                    if get_next_char() in DIGITS:
+                        current_str+=get_next_char()
+                        current_char_index+=1
+                        continue
+                    else:
+                        token_list.append(current_str)
+                        current_str=""
+                        current_char_index+=1
+                        token_state=-1
+                        continue
+                #handing DIGITS end
+
+            #handing normal token end 
+    if error!=0:
+        return -1,0
+
+    return token_list,ID
 
 
 def syntax_analyzer(token_list):

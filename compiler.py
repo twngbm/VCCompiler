@@ -18,15 +18,18 @@ for i in source_code:
     print("{0}: ".format(source_code.index(i)+1),i,end='')
 print("\n\nend of source code.\n")
 
-token_list=scanner(source_code)
+token_list,id_list=scanner(source_code)
 
 if type(token_list)!=list:
     print("error")
     error=1
 
 if error==0:
+    print("\ntoken list\n")
     for i in token_list:
-        print("\n",i)
+        print("\n",i,end=" ")
+    print("\n\nend of token list\n")
+    print("id list:",id_list,"\n")
 
     syntax_tree=syntax_analyzer(token_list)
     if syntax_tree!=Tree:
