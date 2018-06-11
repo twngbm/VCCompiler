@@ -1,12 +1,5 @@
 from symbol_table import *
 
-
-class Tree(object):
-    def __init__(self):
-        self.left=None
-        self.right=None
-        self.data=None
-
 def scanner(source_code):
     ID=[]
     def get_next_char():
@@ -108,6 +101,3 @@ def scanner(source_code):
     return token_list,ID
 
 
-def syntax_analyzer(token_list):
-    syntax_tree=Tree
-    return syntax_tree

@@ -1,5 +1,6 @@
 import time
-from passing import *
+from Lexical_analysis import *
+from Syntactic_analysis import *
 
 error=0
 time1=time.time()
@@ -31,8 +32,8 @@ if error==0:
     print("\n\nend of token list\n")
     print("id list:",id_list,"\n")
 
-    syntax_tree=syntax_analyzer(token_list)
-    if syntax_tree!=Tree:
+    syntax_tree=syntax_analyzer(token_list,id_list)
+    if syntax_tree!=tree:
         print("error")
     
 
