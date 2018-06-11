@@ -12,7 +12,7 @@ def scanner(source_code):
     def get_next_char():
         return current_line[current_char_index+1]
 
-    current_state=-1
+    comment_state=0
     token_list=[]
     current_str=""
     source_code_len=len(source_code)
@@ -29,128 +29,85 @@ def scanner(source_code):
         current_char_index=0
         while current_char_index<len(current_line):
             char=current_line[current_char_index]
-            if current_state==-1:#handling un-stated token
+            current_str+=char
+            if char=="\\":#handling \ not in string
+                print("Stray \\ in program")
+                return -1,0
+            elif char==" " or char=="\t" :#handling white space
+                current_char_index+=1
                 current_str=""
-                if char=="\\":#handling \ not in string
-                    print("Stray \\ in program")
-                    return -1,0
-                elif char==" " or char=="\t":#handling white space
-                    current_char_index+=1
-                elif char=="\n":#handling EOL
-                    break
-                #handing normal token
-                elif char in ALL_CHAR or char=="!":#handling != but ! not in SPECIAL_SYMBOL
-                    current_state=0
-  
-            elif current_state==0:#handling char or string not a token yet
-                current_str+=char
+            elif char=="\n":#handling EOL
+                current_str=""
+                break
+            #handing normal token
+            elif char in ALL_CHAR or comment_state==1:#handling != but ! not in SPECIAL_SYMBOL
                 if current_str in RESERVED_WORD:
-                    current_state=2
-                elif current_str in SPECIAL_SYMBOL:
-                    current_state=3
-                elif current_str in DIGITS:
-                    current_state=4
-                elif get_next_char() in SPECIAL_SYMBOL or get_next_char()==" " or get_next_char()=="\n":
-                    current_state=1
-                else:
-                    current_char_index+=1
-
-            elif current_state==1: #handling ID
-                if current_str not in ID:
-                    ID.append(current_str)
-                token_list.append(current_str)
-                current_state=-1
-                current_char_index+=1
-
-            elif current_state==2:#habdling RESERVED_WORD
-                if get_next_char()==" " or get_next_char()=="\n" or get_next_char() in SPECIAL_SYMBOL:
-                    token_list.append(current_str)
-                    current_state=-1
-                elif get_next_char() in LETTER or get_next_char() in DIGITS:
-                    current_state=0
-                current_char_index+=1
-            
-            elif current_state==3:#habdling SPECIAL_SYMBOL and string and comment
-                if current_str!="'" and current_str!='"':
-                    if current_str=="!" and get_next_char()!="=":
-                        print("Get ! without =.")
-                        return -1,0    
-                    elif current_str in ["<",">","=","!"] and get_next_char()=="=":#handling <= >= == !=
-                        current_str+="="
+                    if get_next_char()==" " or get_next_char()=="\n" or get_next_char()=="\t" or get_next_char() in SPECIAL_SYMBOL:
                         token_list.append(current_str)
+                        current_str=""
+                    current_char_index+=1
+                elif current_str in SPECIAL_SYMBOL or comment_state==1:
+                    if current_str!="'" and current_str!='"':
+                        if current_str=="!" and get_next_char()!="=":
+                            print("Get ! without =.")
+                            return -1,0    
+                        elif current_str in ["<",">","=","!"] and get_next_char()=="=":#handling <= >= == !=
+                            current_str+="="
+                            token_list.append(current_str)
+                            current_char_index+=2
+                            current_str=""
+                        elif current_str=="/" and get_next_char()=="/":#"//"type of comment
+                            current_str=""
+                            current_char_index+=2
+                            while current_line[current_char_index]!="\n":
+                                current_char_index+=1
+                        elif (current_str=="/" and get_next_char()=="*") or comment_state==1:#"/*...*/"type of comment
+                            if comment_state!=1:
+                                current_char_index+=2
+                                comment_state=1
+                            while (current_line[current_char_index]!="*" or get_next_char()!="/") and current_line[current_char_index]!="\n":
+                                current_char_index+=1
+                            if current_line[current_char_index]=="*" and get_next_char()=="/":
+                                current_str=""
+                                comment_state=0
+                                current_char_index+=2
+                        else:
+                            token_list.append(current_str)
+                            current_str=""
+                            current_char_index+=1
+                    elif current_str=="'" or current_str=='"':
+                        start_symbol=current_str
                         current_char_index+=1
-                        current_state=-1
-                    elif current_str=="/" and (get_next_char()=="/" or get_next_char()=="*"):#handling commemt
-                        if get_next_char()=="/":#"//"type of comment
+                        while current_line[current_char_index]!=start_symbol:
+                            current_str+=current_line[current_char_index]
+                            if current_line[current_char_index]=="\n":
+                                print("Error, string end without an ' ")
+                                return 0,0
+                            elif current_line[current_char_index]=='\\':
+                                current_str+=get_next_char()
+                                current_char_index+=1 
                             current_char_index+=1
-                            current_state=32
-                            continue
-                        elif get_next_char()=="*":#"/*...*/"type of comment
-                            current_char_index+=1
-                            current_state=33
-                            continue
-                    else:
+                        current_str+=current_line[current_char_index]
+                        current_char_index+=1
                         token_list.append(current_str)
-                        current_state=-1
-                        
-                elif current_str=="'":
-                    current_state=30
-                    
-                elif current_str=='"':
-                    current_state=31
-                current_char_index+=1
-                    
-            elif current_state==30:#handling string start with '
-                current_str+=char
-                if char=="\n":
-                    print("Error, string end without an ' ")
-                    return 0,0
-                elif char=='\\':
-                    current_str+=get_next_char()
-                    current_char_index+=1 
-                elif char=="'":
+                        current_str=""    
+                elif current_str in DIGITS:
+                    while get_next_char() in DIGITS:
+                        current_str+=get_next_char()
+                        current_char_index+=1
                     token_list.append(current_str)
-                    current_state=-1
-                current_char_index+=1
-                    
-            elif current_state==31:#handling string start with "
-                current_str+=char
-                if char=="\n":
-                    print("Error, string end without an \" ")
-                    return 0,0
-                elif char=='\\':
-                    current_str+=get_next_char()
                     current_char_index+=1
-                elif char=='"':
+                    current_str=""
+                elif get_next_char() in SPECIAL_SYMBOL or get_next_char()==" " or get_next_char()=="\n":
+                    if current_str not in ID:
+                        ID.append(current_str)
                     token_list.append(current_str)
-                    current_state=-1   
-                current_char_index+=1
-
-            elif current_state==32:#"//"type of comment
-                if char=="\n":
-                    current_state=-1
-                current_char_index+=1
-                    
-                    
-            elif current_state==33:#"/*...*/"type of comment
-                if char=="\n":
-                    break
-                elif char=="*" and get_next_char()=="/":
                     current_char_index+=1
-                    current_state=-1
-                current_char_index+=1
-                    
-            elif current_state==4:#handling DIGITS
-                if get_next_char() in DIGITS:
-                    current_str+=get_next_char()
+                    current_str=""
                 else:
-                    token_list.append(current_str)
-                    current_state=-1
-                current_char_index+=1  
-
+                    current_char_index+=1
 
         #handing normal token end 
-
 
     return token_list,ID
 
