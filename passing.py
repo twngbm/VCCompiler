@@ -11,7 +11,6 @@ def scanner(source_code):
     ID=[]
     def get_next_char():
         return current_line[current_char_index+1]
-
     comment_state=0
     token_list=[]
     current_str=""
@@ -23,8 +22,7 @@ def scanner(source_code):
     for current_line_ in source_code:
         current_line_index+=1
         if current_line_index>=source_code_len:
-            current_line_+="\n"
-        
+            current_line_+="\n"        
         current_line=list(current_line_)
         current_char_index=0
         while current_char_index<len(current_line):
@@ -106,9 +104,7 @@ def scanner(source_code):
                     current_str=""
                 else:
                     current_char_index+=1
-
         #handing normal token end 
-
     return token_list,ID
 
 
