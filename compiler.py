@@ -22,7 +22,10 @@ print("\n\nend of source code.\n")
 token_list,id_list=scanner(source_code)
 
 if type(token_list)!=list:
-    print("error")
+    print("Error,Lexical error")
+    error=1
+elif len(token_list)==0:
+    print("Error, No token found")
     error=1
 
 if error==0:
@@ -32,20 +35,22 @@ if error==0:
     print("\n\nend of token list\n")
     print("id list:",id_list,"\n")
 
-    syntax_tree=syntax_analyzer(token_list,id_list)
-    if syntax_tree!=tree:
-        print("error")
-    
+    parse_tree=syntax_analyzer(token_list,id_list)
 
-    with open('test.asm','w') as f:
-        for i in PROLOGUE:
-            f.write(i)
-
-        f.write("   main	PROC\n")
-
-        for i in EPILOGUE:
-            f.write(i)
-    f.closed
+    if type(parse_tree)==int:
+        print("Error, Syntax error")
+    else:
+        with open('test.asm','w') as f:
+            if "Program_Header" in parse_tree.list_child_name():
+                for i in PROLOGUE:
+                    f.write(i)
+            if "Program_Body" in parse_tree.list_child_name():
+                for i in EPILOGUE:
+                    f.write(i)
+                if "DCL_LIST" in parse_tree.get_child(1).list_child_name():
+                    if "int" in parse_tree.get_child(1).get_child(1).list_child_name():
+                        print("Yes")
+        f.closed
 
 time2=time.time()
 print("\nEnd Processing, waste",time2-time1,"\n")

@@ -1,39 +1,15 @@
-    println("** Program execution starts... ");
-    print  ("   Please enter an integer: " );
-    read(n);
-    if (n < 0) println("  Error!! Invalid input.");
-      else {
-        msg1 = "Start computing the factorial of ";
-        print(msg1);
-        println(n);
-        
-        nfact = 1;
-        if (n > 1 ) {
-            tfact = nfact;
-            K1 = 2;
-            while (K1 <= n) {
-               tfact = tfact * K1;
-               if (tfact >= nfact) {
-                   nfact = tfact;
-                 } else {
-                   print(a1);
-                   print(a2);
-                   print(" at K1= ");
-                   println(K1);
-                   K1 = n+1;
-                 }
-               K1 = K1+1;
-             } // end-while
-          }
-        msg1 = "  The factorial of ";
-        print(msg1);
-        print(n);
-        print(e1);
-        println(nfact);
-      }
-    println("** Program execution completed. ");
-    msg1 = "Good-Bye!";
-    println(msg1);
-
- /************************************************/
-}
+/*
+/**************************************************
+ *                                                *
+ *   Program: vc-A1-T15.vcc                       *
+ *                                                *
+ *   Vanilla-C compiler test program A1-T15       *
+ *   Purpose: Testing Vanilla-C compiler of A1    *
+ *   Test Items:                                  *
+ *     (1) Basic program unit                     *
+ *     (2) Comments                               *
+ *   Note: This is a template.                    *
+ *   Date: 2012/05/08                             *
+ **************************************************
+*/
+main(){int a; }
