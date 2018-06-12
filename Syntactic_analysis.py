@@ -64,6 +64,15 @@ class tree(object):
                 return -1
         self.child_node.append(child_name)
         return 0
+    def where_is(self,name):
+        node_o=self
+        node=node_o
+        while True:
+            for i in range(len(node.child_node)):
+                for n in node.child_node:
+                    if n.node_name==name:
+                        return n
+            node=node_o.child_node[i]
 
 class leaf():
     def __init__(self,_father=None,_data=None,name=""):
@@ -125,6 +134,8 @@ def syntax_analyzer(token_list,id_list):
             Program_Body.create_child(name="DCL_LIST")
             DCL_LIST=Program_Body.get_child(1)
             multi_defin=0
+            for data_type in TYPE_DECLARATION_WORD:
+                DCL_LIST.create_child(name=data_type,only=1)
             while True:
                 current_token_index+=1
                 token=token_list[current_token_index]
@@ -133,8 +144,7 @@ def syntax_analyzer(token_list,id_list):
                     error=link(parse_tree,Program_Body,1)
                     break
                 elif token in TYPE_DECLARATION_WORD or multi_defin==1:
-                    if token not in Program_Body.get_child(1).list_child_name():
-                        DCL_LIST.create_child(name=token,only=1)
+                    if multi_defin==0:    
                         DATA_DEF=DCL_LIST.get_child_by_name(token)
                     if get_next_token(1) not in id_list:
                         print("Error, Excpet an ID")
@@ -154,7 +164,7 @@ def syntax_analyzer(token_list,id_list):
                                  int_data=int(get_next_token(3))
                                  DCL_LIST.get_child_by_name("int").get_child_by_name(get_next_token(1)).create_leaf(_data=int_data,name="data")
                             except:
-                                pass
+                                
                             if get_next_token(4)==",":
                                 multi_defin=1
                                 current_token_index+=3

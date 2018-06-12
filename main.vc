@@ -1,12 +1,12 @@
 /*
 /**************************************************
  *                                                *
- *   Program: vc-A2-T05.vcc                       *
+ *   Program: vc-A2-T02.vcc                       *
  *                                                *
- *   Vanilla-C compiler test program A2-T05       *
+ *   Vanilla-C compiler test program A2-T02       *
  *   Purpose: Testing Vanilla-C compiler of A2    *
  *   Test Items:                                  *
- *     (1) Data clarations - const                *
+ *     (1) Data clarations - bool                 *
  *     (2) Comments                               *
  *   Note: This is a template.                    *
  *   Date: 2012/05/08                             *
@@ -18,7 +18,8 @@ main()
   //   SYMBOLIC CONSTANTS AND VARIABLES
   // ----------------------------------------------
 
-int x=1;
+  bool    vB1,    vB12,     vB123;
+
 
   // ----------------------------------------------
   //   PROCESSING STATEMENTS
