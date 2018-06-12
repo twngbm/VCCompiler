@@ -39,8 +39,7 @@ Syntax_Rule={"DCL_LIST":[],
 STMT_LIST=[]
 
 DATA_LIST=[
-".DATA\n",
-"  _SID	DB	 \"x86 MASM Program.\"\n",
+
 ]
 ###################Define Program Body and Data###################
 
@@ -69,8 +68,7 @@ EPILOGUE=[
 "                                        ; stopping program execution \n",
 "        exit                            ; invoke   ExitProcess, 0\n",
 "   main	ENDP\n",
+".DATA\n",
+"  _SID	DB	 \"x86 MASM Program.\"\n",
 ]
-for data in DATA_LIST:
-    EPILOGUE.append(data)
-EPILOGUE.append("  	END	main    \n")
 ###################Define PROLOGUE and EPILOGUE###################

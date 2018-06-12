@@ -49,7 +49,23 @@ if error==0:
                     f.write(i)
                 if "DCL_LIST" in parse_tree.get_child(1).list_child_name():
                     if "int" in parse_tree.get_child(1).get_child(1).list_child_name():
-                        print("Yes")
+                        for i in parse_tree.get_child(1).get_child(1).get_child(0).list_child_name():
+                            if parse_tree.get_child(1).get_child(1).get_child_by_name("int").get_child_by_name(i).list_child_name!=[]:
+                                f.write("  v{0}  DD  {1}\n".format(i,parse_tree.get_child(1).get_child(1).get_child_by_name("int").get_child_by_name(i).get_child_by_name("data").data))
+                            else:
+                                f.write("  v{0}  DD  0\n".format(i))
+                    if "bool" in parse_tree.get_child(1).get_child(1).list_child_name():
+                        for i in parse_tree.get_child(1).get_child(1).get_child(0).list_child_name():
+                            f.write("  {0}  DB 0\n".format(i))
+                    if "char" in parse_tree.get_child(1).get_child(1).list_child_name():
+                        for i in parse_tree.get_child(1).get_child(1).get_child(0).list_child_name():
+                            f.write("  {0}  DB ''\n".format(i))
+                    if "string" in parse_tree.get_child(1).get_child(1).list_child_name():
+                        f.write("  _S0000  DB  0\n")
+                        for i in parse_tree.get_child(1).get_child(1).get_child(0).list_child_name():
+                            f.write("  {0}  DB _S0000\n".format(i))
+                f.write("  	END	main    \n")
+                
         f.closed
 
 time2=time.time()

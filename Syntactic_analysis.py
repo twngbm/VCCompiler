@@ -18,7 +18,16 @@ class tree(object):
         return child_list
     def get_child(self,child_index):
         return self.child_node[child_index]
+    def get_child_by_name(self,child_name):
+        child_list=[]
+        for i in self.child_node:
+            child_list.append(i.node_name)
+        if child_list.count(child_name)>1:
+            pass
+        child_index=child_list.index(child_name)
+        return self.child_node[child_index]
     def create_child(self,_data=None,name=None,only=0):
+        child_list=[]
         if only==1:
             for i in self.child_node:
                 child_list.append(i.node_name)
@@ -33,6 +42,7 @@ class tree(object):
         return 0
     def create_leaf(self,_data,name,only=0):
         if only==1:
+            child_list=[]
             for i in self.child_node:
                 child_list.append(i.node_name)
             if name in child_list:
@@ -114,36 +124,57 @@ def syntax_analyzer(token_list,id_list):
             Program_Body.create_leaf(token,"{")
             Program_Body.create_child(name="DCL_LIST")
             DCL_LIST=Program_Body.get_child(1)
+            multi_defin=0
             while True:
                 current_token_index+=1
                 token=token_list[current_token_index]
-                multi_defin=0
                 if token=="}":
                     Program_Body.create_leaf("}","}")
                     error=link(parse_tree,Program_Body,1)
                     break
-                elif token=="int" or multi_defin==1:
-                    if "int" not in Program_Body.get_child(1).list_child_name():
-                        DCL_LIST.create_child(name="int")
-                        INT=DCL_LIST.get_child(0)
+                elif token in TYPE_DECLARATION_WORD or multi_defin==1:
+                    if token not in Program_Body.get_child(1).list_child_name():
+                        DCL_LIST.create_child(name=token,only=1)
+                        DATA_DEF=DCL_LIST.get_child_by_name(token)
                     if get_next_token(1) not in id_list:
                         print("Error, Excpet an ID")
                         return 0
-                    else:
-                        INT.create_leaf(_data=get_next_token(1),name=get_next_token(1))
+                    elif get_next_token(1) in id_list or multi_defin==1:
+                        DATA_DEF.create_child(_data=get_next_token(1),name=get_next_token(1),only=1)
                         if get_next_token(2)==";":
                             current_token_index+=2
+                            multi_defin=0
                             continue
                         elif get_next_token(2)==",":
                             multi_defin=1
+                            current_token_index+=1
                             continue
+                        elif get_next_token(2)=="=":
+                            try:
+                                 int_data=int(get_next_token(3))
+                                 DCL_LIST.get_child_by_name("int").get_child_by_name(get_next_token(1)).create_leaf(_data=int_data,name="data")
+                            except:
+                                pass
+                            if get_next_token(4)==",":
+                                multi_defin=1
+                                current_token_index+=3
+                                continue
+                            elif get_next_token(4)==";":
+                                multi_defin=0
+                                current_token_index+=3
+                                continue
+                            
+
                         else:
                             print("Error, Except , or ; after define.")
                             return 0
-                        
+
+                else:
+                    pass        
             
         else:
             print("Error, Except { or } after main()")
+            return 0
 
         if "Program_Header" not in parse_tree.list_child_name():
             print("Error, Start without main")

@@ -1,15 +1,28 @@
 /*
 /**************************************************
  *                                                *
- *   Program: vc-A1-T15.vcc                       *
+ *   Program: vc-A2-T05.vcc                       *
  *                                                *
- *   Vanilla-C compiler test program A1-T15       *
- *   Purpose: Testing Vanilla-C compiler of A1    *
+ *   Vanilla-C compiler test program A2-T05       *
+ *   Purpose: Testing Vanilla-C compiler of A2    *
  *   Test Items:                                  *
- *     (1) Basic program unit                     *
+ *     (1) Data clarations - const                *
  *     (2) Comments                               *
  *   Note: This is a template.                    *
  *   Date: 2012/05/08                             *
  **************************************************
 */
-main(){int a; }
+main()
+{
+  // ----------------------------------------------
+  //   SYMBOLIC CONSTANTS AND VARIABLES
+  // ----------------------------------------------
+
+int x=1;
+
+  // ----------------------------------------------
+  //   PROCESSING STATEMENTS
+  // ----------------------------------------------
+
+  // --- END OF PROGRAM ---------------------------  
+}
