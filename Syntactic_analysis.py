@@ -207,7 +207,8 @@ def syntax_analyzer(token_list,id_list):
                 print("Error, expected an ID.")
                 return 0
         while state==5:
-            if token=="print":
+            if token=="print" or token=="println":
+                token_print=token
                 if get_next_token(1)=="(":
                     if get_next_token(2)[0]=="'" or get_next_token(2)[0]=="\"":
                         string_count+=1
@@ -216,7 +217,7 @@ def syntax_analyzer(token_list,id_list):
                         except:
                             Data_Section=Program_Body.create_child(Data="Data_Section")
                         Data_Section.create_child(Data="string").create_child(Data=str(string_count),Meta_data="str_in_print").create_child(Data=str(get_next_token(2)))
-                        Statement_Section.create_child(Data="print",Meta_data=str(string_count)).create_child(Data="string")
+                        Statement_Section.create_child(Data=token_print,Meta_data=str(string_count)).create_child(Data="string")
                         if get_next_token(3)==")" and get_next_token(4)==";":
                             current_token_index+=5
                             state=2
@@ -225,7 +226,7 @@ def syntax_analyzer(token_list,id_list):
                             print("Error, expected ) or ; after print statement.")
                             return 0           
                     elif get_next_token(2) in id_list:
-                        Statement_Section.create_child(Data="print").create_child(Data=id_type[get_next_token(2)])
+                        Statement_Section.create_child(Data=token_print).create_child(Data=id_type[get_next_token(2)])
                         if get_next_token(3)==")" and get_next_token(4)==";":
                             current_token_index+=5
                             state=2
@@ -240,43 +241,7 @@ def syntax_analyzer(token_list,id_list):
                 else:
                     print("Error, expected a ( .")
                     return 0
-            elif token=="println":
-                state=6
-                break
-        while state==6:
-            if token=="println":
-                if get_next_token(1)=="(":
-                    if get_next_token(2)[0]=="'" or get_next_token(2)[0]=="\"":
-                        string_count+=1
-                        try:
-                            Data_Section in Program_Body.child
-                        except:
-                            Data_Section=Program_Body.create_child(Data="Data_Section")
-                        Data_Section.create_child(Data="string").create_child(Data=str(string_count),Meta_data="str_in_print").create_child(Data=str(get_next_token(2)))
-                        Statement_Section.create_child(Data="println",Meta_data=str(string_count)).create_child(Data="string")
-                        if get_next_token(3)==")" and get_next_token(4)==";":
-                            current_token_index+=5
-                            state=2
-                            break
-                        else:
-                            print("Error, expected ) or ; after print statement.")
-                            return 0           
-                    elif get_next_token(2) in id_list:
-                        Statement_Section.create_child(Data="println").create_child(Data=id_type[get_next_token(2)])
-                        if get_next_token(3)==")" and get_next_token(4)==";":
-                            current_token_index+=5
-                            state=2
-                            break
-                        else:
-                            print("Error, expected ) or ; after print statement.")
-                            return 0           
-                      
-                    else:
-                        print("Error, expected string , char or string,char data type in print.")
-                        return 0
-                else:
-                    print("Error, expected a ( .")
-                    return 0
+            
 
                 
 

@@ -59,7 +59,7 @@ def semantic_analyzer(parse_tree):
                             EPILOGUE.append("  {0}\t\tDD\t _S{1}\n".format(i,str(current_node.next_node().next_node().meta_data).zfill(4)))
                     current_node=current_node.next_node()
                     current_node=current_node.next_node()
-            elif current_node.data=="print":
+            elif current_node.data=="print" or current_node.data=="println":
                 if current_node.next_node().data[0]=="string" or current_node.next_node().data=="string":
                     if type(current_node.next_node().data)==list:
                         f.write("\t\tMOV\t\tEDX, OFFSET _S{0}\n".format(str(current_node.next_node().data[1].next_node().meta_data).zfill(4)))
@@ -94,50 +94,9 @@ def semantic_analyzer(parse_tree):
                         f.write("\t\tcall\tWriteChar\n")
                         f.write("\t\tMOV\t\tal, 'E'\n")
                         f.write("\t\tcall\tWriteChar\n")
+                if current_node.data=="println":
+                    f.write("\t\tcall\tCrlf\n")    
                 current_node=current_node.next_node()
-            elif current_node.data=="println":
-                if current_node.next_node().data[0]=="string" or current_node.next_node().data=="string":
-                    if type(current_node.next_node().data)==list:
-                        f.write("\t\tMOV\t\tEDX, OFFSET _S{0}\n".format(str(current_node.next_node().data[1].next_node().meta_data).zfill(4)))
-                        f.write("\t\tcall\tWriteString\n")
-                        f.write("\t\tcall\tCrlf\n")
-                    else:
-                        f.write("\t\tMOV\t\tEDX, OFFSET _S{0}\n".format(str(current_node.meta_data).zfill(4)))
-                        f.write("\t\tcall\tWriteString\n")
-                        f.write("\t\tcall\tCrlf\n")
-                elif current_node.next_node().data[0]=="char":
-                    f.write("\t\tMOV\t\tal, {0}\n".format(str(current_node.next_node().data[1].next_node().next_node().data)))
-                    f.write("\t\tcall\tWriteChar\n")
-                    f.write("\t\tcall\tCrlf\n")
-                elif current_node.next_node().data[0]=="int":
-                    f.write("\t\tMOV\t\tEAX, {0}\n".format(str(current_node.next_node().data[1].next_node().data)))
-                    f.write("\t\tcall\tWriteInt\n")
-                    f.write("\t\tcall\tCrlf\n")
-                elif current_node.next_node().data[0]=="bool":
-                    if current_node.next_node().data[1].next_node().next_node().data=="TRUE":
-                        f.write("\t\tMOV\t\tal, 'T'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'R'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'U'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'E'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tcall\tCrlf\n")
-                    else:
-                        f.write("\t\tMOV\t\tal, 'F'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'A'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'L'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'S'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tMOV\t\tal, 'E'\n")
-                        f.write("\t\tcall\tWriteChar\n")
-                        f.write("\t\tcall\tCrlf\n")
-                current_node=current_node.next_node()
-
 
         for line in EPILOGUE:
             f.write(line)
