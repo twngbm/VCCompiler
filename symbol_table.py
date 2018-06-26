@@ -69,6 +69,6 @@ EPILOGUE=[
 "        exit                            ; invoke   ExitProcess, 0\n",
 "   main	ENDP\n",
 ".DATA\n",
-"  _SID	DB	 \"x86 MASM Program.\"\n",
+"  _SID\t\tDB	 \"x86 MASM Program.\"\n",
 ]
 ###################Define PROLOGUE and EPILOGUE###################

@@ -1,6 +1,7 @@
 import time
 from Lexical_analysis import *
 from Syntactic_analysis import *
+from Semantic_analysis import *
 
 error=0
 time1=time.time()
@@ -40,33 +41,8 @@ if error==0:
     if type(parse_tree)==int:
         print("Error, Syntax error")
     else:
-        with open('test.asm','w') as f:
-            if "Program_Header" in parse_tree.list_child_name():
-                for i in PROLOGUE:
-                    f.write(i)
-            if "Program_Body" in parse_tree.list_child_name():
-                for j in EPILOGUE:
-                    f.write(j)
-                if "DCL_LIST" in parse_tree.get_child(1).list_child_name():
-                    if "int" in parse_tree.get_child(1).get_child(1).list_child_name():
-                        for k in parse_tree.get_child(1).get_child(1).get_child_by_name("int").list_child_name():
-                            if parse_tree.get_child(1).get_child(1).get_child_by_name("int").get_child_by_name(k).list_child_name!=[]:
-                                f.write("  v{0}  DD  {1}\n".format(k,parse_tree.get_child(1).get_child(1).get_child_by_name("int").get_child_by_name(k).get_child_by_name("data").data))
-                            else:
-                                f.write("  v{0}  DD  0\n".format(k))
-                    if "bool" in parse_tree.get_child(1).get_child(1).list_child_name():
-                        for k in parse_tree.get_child(1).get_child(1).get_child_by_name("bool").list_child_name():
-                            f.write("  {0}  DB 0\n".format(k))
-                    if "char" in parse_tree.get_child(1).get_child(1).list_child_name():
-                        for k in parse_tree.get_child(1).get_child(1).get_child_by_name("char").list_child_name():
-                            f.write("  {0}  DB ''\n".format(k))
-                    if "string" in parse_tree.get_child(1).get_child(1).list_child_name():
-                        f.write("  _S0000  DB  0\n")
-                        for k in parse_tree.get_child(1).get_child(1).get_child_by_name("string").list_child_name():
-                            f.write("  {0}  DB _S0000\n".format(k))
-                f.write("  	END	main    \n")
-                
-        f.closed
+        semantic_analyzer(parse_tree)
+        
 
 time2=time.time()
 print("\nEnd Processing, waste",time2-time1,"\n")

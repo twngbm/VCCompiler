@@ -1,225 +1,194 @@
 from symbol_table import *
 
 class tree(object):
-    def __init__(self,_data=None,name=None):
+    def __init__(self,Data=None):
         self.father=None
-        self.data=_data
-        self.child_node=[]
-        self.node_name=name
-    def list_child(self):
-        child_list=[]
-        for i in self.child_node:
-            child_list.append((i,i.node_name))
-        return child_list
+        self.data=Data
+        self.child=[]
+
     def list_child_name(self):
         child_list=[]
-        for i in self.child_node:
-            child_list.append(i.node_name)
+        for i in self.child:
+            child_list.append(i.data)
         return child_list
-    def get_child(self,child_index):
-        return self.child_node[child_index]
-    def get_child_by_name(self,child_name):
-        child_list=[]
-        for i in self.child_node:
-            child_list.append(i.node_name)
-        if child_list.count(child_name)>1:
-            pass
-        child_index=child_list.index(child_name)
-        return self.child_node[child_index]
-    def create_child(self,_data=None,name=None,only=0):
-        child_list=[]
-        if only==1:
-            for i in self.child_node:
-                child_list.append(i.node_name)
-            if name in child_list:
-                print("Error, multi element found,but can only have one.")
-                return -1
-        child_tree=tree()
-        child_tree.father=self
-        child_tree.data=_data
-        child_tree.node_name=str(name)
-        self.child_node.append(child_tree)
-        return 0
-    def create_leaf(self,_data,name,only=0):
-        if only==1:
-            child_list=[]
-            for i in self.child_node:
-                child_list.append(i.node_name)
-            if name in child_list:
-                print("Error, multi element found,but can only have one.")
-                return -1
-        child_tree=leaf()
-        child_tree.father=self
-        child_tree.data=_data
-        child_tree.node_name=str(name)
-        self.child_node.append(child_tree)
-        return 0
-    def add_child(self,child_name,only=0):
-        if only==1:
-            child_list=[]
-            for i in self.child_node:
-                child_list.append(i.node_name)
-            if child_name in child_list:
-                print("Error, multi element found,but can only have one.")
-                return -1
-        self.child_node.append(child_name)
-        return 0
-    def where_is(self,name):
-        node_o=self
-        node=node_o
-        while True:
-            for i in range(len(node.child_node)):
-                for n in node.child_node:
-                    if n.node_name==name:
-                        return n
-            node=node_o.child_node[i]
 
-class leaf():
-    def __init__(self,_father=None,_data=None,name=""):
-        self.father=_father
-        self.data=_data
-        self.node_name=name
+    def is_leaf(self):
+        if len(self.child)==0:
+            return True
+        else:
+            return False
+
+    def create_child(self,Data,Uniq=0):
+        if Uniq==1:
+            if Data in self.list_child_name():
+                print("Error ,{0} appear more than one time".format(Data))
+                return 0
+        child_node=tree()
+        child_node.father=self
+        child_node.data=Data
+        child_node.child=[]
+        self.child.append(child_node)
+        return child_node
+
+    def next_node(self):
+        if self.is_leaf()==False:
+            return self.child[0]
+        elif self.is_leaf()==True:
+            while self.father.child[-1]==self:
+                self=self.father
+                if self.data=="root":
+                    return 0
+            return self.father.child[self.father.child.index(self)+1]
 
 
 def syntax_analyzer(token_list,id_list):
-    error=0
-    parse_tree=tree()
-    parse_tree.node_name="Program"
-
-
-    def link(father,son,only=0):
-        error=father.add_child(son,only)
-        if error==0:
-            son.father=father
-            return 0
-        return -1
-    def get_next_token(shift):
+    def get_next_token(shift=0):
         try:
             return token_list[current_token_index+shift]
         except:
             print("Error, No more token.")
-
+            return 0
+    id_type={}
+    state=0
+    error=0
+    parse_tree=tree()
+    parse_tree.data="root"
     current_token_index=0
     token_number=len(token_list)
-    token_stack=[]
     while current_token_index<token_number:
         token=token_list[current_token_index]
         if error!=0:
             return 0
-        token_stack.append(token)
-        if token in RESERVED_WORD:
-            if token == "main":
+        while state==0:
+            token=get_next_token()
+            if current_token_index==0 and token=="main":
                 if get_next_token(1)=="(" and get_next_token(2)==")":
-                        Program_Header=tree(None,"Program_Header")
-                        Program_Header.create_leaf(token,"main")
-                        Program_Header.create_leaf("()","()")
-                        error=link(parse_tree,Program_Header,1)
-                        current_token_index+=3
-                else:
-                    print("Error, Except ( or ) after main.")
-                    return 0
-            else:
-                pass
-        elif token in id_list:
-            pass
-        elif token=="{" and get_next_token(1)=="}":
-            Program_Body=tree(name="Program_Body")
-            Program_Body.create_leaf(token,"{")
-            Program_Body.create_leaf("}","}")
-            error=link(parse_tree,Program_Body,1)
-            current_token_index+=2
-        elif token=="{" and get_next_token(1) in TYPE_DECLARATION_WORD:
-            Program_Body=tree(name="Program_Body")
-            Program_Body.create_leaf(token,"{")
-            Program_Body.create_child(name="DCL_LIST")
-            DCL_LIST=Program_Body.get_child(1)
-            multi_defin=0
-            for data_type in TYPE_DECLARATION_WORD:
-                DCL_LIST.create_child(name=data_type,only=1)
-            while True:
-                current_token_index+=1
-                token=token_list[current_token_index]
-                if token=="}":
-                    Program_Body.create_leaf("}","}")
-                    error=link(parse_tree,Program_Body,1)
+                    Program_Header=parse_tree.create_child(Data="Program_Header",Uniq=1)
+                    current_token_index+=3
+                    state=1
                     break
-                elif token in TYPE_DECLARATION_WORD or multi_defin==1:
-                    if multi_defin==0:    
-                        DATA_DEF=DCL_LIST.get_child_by_name(token)
-                    if get_next_token(1) not in id_list:
-                        print("Error, Excpet an ID")
-                        return 0
-                    elif get_next_token(1) in id_list or multi_defin==1:
-                        DATA_DEF.create_child(_data=get_next_token(1),name=get_next_token(1),only=1)
-                        if get_next_token(2)==";":
-                            current_token_index+=2
-                            multi_defin=0
-                            continue
-                        elif get_next_token(2)==",":
-                            multi_defin=1
-                            current_token_index+=1
-                            continue
-                        elif get_next_token(2)=="=":
-                            try:
-                                 int_data=int(get_next_token(3))
-                                 DCL_LIST.get_child_by_name("int").get_child_by_name(get_next_token(1)).create_leaf(_data=int_data,name="data")
-                            except:
-                                
-                            if get_next_token(4)==",":
-                                multi_defin=1
-                                current_token_index+=3
-                                continue
-                            elif get_next_token(4)==";":
-                                multi_defin=0
-                                current_token_index+=3
-                                continue
-                            
-
-                        else:
-                            print("Error, Except , or ; after define.")
-                            return 0
-
                 else:
-                    pass        
-            
-        else:
-            print("Error, Except { or } after main()")
-            return 0
-
-        if "Program_Header" not in parse_tree.list_child_name():
-            print("Error, Start without main")
-            return 0
-        
-        if "Program_Header" in parse_tree.list_child_name() and "Program_Body" in parse_tree.list_child_name():
-            return parse_tree
-    return parse_tree
-
-
-
-
-##########################################################################
-"""
-        if token in RESERVED_WORD:
-            if token == "main":
-                if get_next_token(1)=="(" and get_next_token(2)==")":
-                     Program_Header=tree(None,"Program_Header")
-                     Program_Header.create_leaf(token,"main")
-                     Program_Header.create_leaf("()","()")
-                     error=link(parse_tree,Program_Header,1)
-                     current_token_index+=3
-                else:
-                    print("Error, Except ( or ) after main.")
+                    print("Error, expected ( and ) after main")
                     return 0
             else:
+                print("Error , expected a main before any statment.")
+                return 0
+
+        while state==1:
+            token=get_next_token()
+            if token=="{":
+                Program_Body=parse_tree.create_child(Data="Program_Body",Uniq=1)
+                current_token_index+=1
+                state=2
+                break
+            else:
+                print("Error, expected { after main()")
+                return 0
+        while state==2:
+            token=get_next_token()
+            if token in TYPE_DECLARATION_WORD:
+                try:
+                    Data_Section in Program_Body.child
+                except:
+                    Data_Section=Program_Body.create_child(Data="Data_Section",Uniq=1)
+                state=3
+                break
+            elif token=="}":
+                return parse_tree
+            else:
+                print("Error, expected } after all statement.")
+                return 0
+        while state==3:
+            token=token_list[current_token_index]
+            if token=="const":
+                state=4
+                break 
+            if token in ["bool","char","int","string"] or data_type in ["bool","char","int","string"]:
+                if get_next_token(1) in id_list:
+                    if get_next_token(1) in id_type:
+                        print("Error redeclaration of {0}".format(get_next_token(1)))
+                        return 0
+                    elif get_next_token(2)==";":
+                        if token in ["bool","char","int","string"]:
+                            data_type=token
+                        v_data=Data_Section.create_child(Data=data_type)
+                        v_data.create_child(Data=get_next_token(1))
+                        id_type[get_next_token(1)]=data_type
+                        current_token_index+=3
+                        state=2
+                        data_type=None
+                        break
+                    elif get_next_token(2)=="," or data_type in ["bool","char","int","string"]:
+                        if token in ["bool","char","int","string"]:
+                            data_type=token
+                        v_data=Data_Section.create_child(Data=data_type)
+                        v_data.create_child(Data=get_next_token(1))
+                        id_type[get_next_token(1)]=[data_type,v_data]
+                        current_token_index+=2
+                    else:
+                        print("Error , expected ; or ,")
+                        return 0
+                else:
+                    print("Error, expected an ID.")
+                    return 0
+        while state==4:
+            token=token_list[current_token_index]
+            if get_next_token(1) in id_list:
+                if get_next_token(1) in id_type:
+                    print("Error redeclaration of {0}".format(get_next_token(1)))
+                    return 0
+                if get_next_token(2)=="=":
+                    if get_next_token(3) in id_list:
+                        if get_next_token(3) in id_type:
+                            v_data=id_type[get_next_token(3)][1]
+                            if v_data.data!="string":
+                                v_id_data=Data_Section.create_child(Data=v_data.data)
+                                v_id_data.create_child(Data=get_next_token(1)).create_child(Data=v_data.next_node().next_node().data)
+                                id_type[get_next_token(1)]=[v_data.data,v_id_data]
+                            else:
+                                v_data.next_node().data=[v_data.next_node().data,get_next_token(1)]
+                                id_type[get_next_token(1)]=[v_data.data,v_data]
+                        else:
+                            print("Error , undeclared data.")
+                    elif get_next_token(3).isdigit():
+                        v_data=Data_Section.create_child(Data="int")
+                        v_data.create_child(Data="v"+get_next_token(1)).create_child(Data=int(get_next_token(3)))
+                        id_type["v"+get_next_token(1)]=["int",v_data]
+                    elif get_next_token(3) in BOOL_WORD:
+                        v_data=Data_Section.create_child(Data="bool")
+                        v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3))
+                        id_type[get_next_token(1)]=["bool",v_data]
+                    elif get_next_token(3).isprintable():
+                        if get_next_token(3)[0]=="'":
+                            v_data=Data_Section.create_child(Data="char")
+                            v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3))
+                            id_type[get_next_token(1)]=["char",v_data]
+                        else:
+                            v_data=Data_Section.create_child(Data="string")
+                            v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3))
+                            id_type[get_next_token(1)]=["string",v_data]
+                    if get_next_token(4)==";":
+                        current_token_index+=5
+                        state=2
+                        break
+                    elif get_next_token(4)==",":
+                        current_token_index+=4
+                        continue
+                    else:
+                        print("Error, expected ; or ,")
+                        return 0
+                elif get_next_token(2)==";":
+                    current_token_index+=3
+                    state=2
+                    break
+                else:
+                    print("Error, expected a =")
+            elif get_next_token(1)==";":
+                current_token_index+=2
+                state=2
+                break
+            else:
+                print("Error, expected an ID.")
                 pass
-        elif token in STRUCTURE_SYMBOL:
-            pass
-        if "Program_Header" not in parse_tree.list_child_name():
-            print("Error, Start without main")
-            return 0
-        else:
-            pass
-"""
 
 
-    
