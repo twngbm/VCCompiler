@@ -93,6 +93,8 @@ def syntax_analyzer(token_list,id_list):
                     Data_Section=Program_Body.create_child(Data="Data_Section",Uniq=1)
                 state=3
                 break
+            elif token in STRUCTURE_WORD or token in id_type:
+                pass
             elif token=="}":
                 return parse_tree
             else:
