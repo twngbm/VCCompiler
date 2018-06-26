@@ -14,19 +14,10 @@
 */
 main()
 {
-  // ----------------------------------------------
-  //   SYMBOLIC CONSTANTS AND VARIABLES
-  // ----------------------------------------------
-
-
-  const  msg1="Hello!";
-  const mesg2=msg1;
-  string mesg3;
-
-
-  // ----------------------------------------------
-  //   PROCESSING STATEMENTS
-  // ----------------------------------------------
-
-  // --- END OF PROGRAM ---------------------------  
+const c=1,d='a',e="wwww";
+println("asd");
+println('z');
+println(c);
+println(d);
+println(e);
 }

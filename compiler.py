@@ -37,7 +37,10 @@ if error==0:
     print("id list:",id_list,"\n")
     try:
         parse_tree,id_type=syntax_analyzer(token_list,id_list)
-        semantic_analyzer(parse_tree)
+        try:
+            semantic_analyzer(parse_tree)
+        except:
+            print("Error, Semantic error.")
     except:
         print("Error, Syntax error")
 time2=time.time()

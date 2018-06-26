@@ -92,12 +92,16 @@ def scanner(source_code):
                 elif get_next_char() in SPECIAL_SYMBOL or get_next_char()==" " or get_next_char()=="\n":
                     if current_str not in ID:
                         ID.append(current_str)
-                    token_list.append(current_str)
+                    token_list.append("_"+current_str)
                     current_char_index+=1
                     current_str=""
                 else:
                     current_char_index+=1
         #handing normal token end 
-    return token_list,ID
+
+    new_ID=[]
+    for item in ID:
+        new_ID.append("_"+item)
+    return token_list,new_ID
 
 
