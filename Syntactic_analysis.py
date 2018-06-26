@@ -5,6 +5,7 @@ class tree(object):
         self.father=None
         self.data=Data
         self.child=[]
+        self.meta_data=None
 
     def list_child_name(self):
         child_list=[]
@@ -18,7 +19,7 @@ class tree(object):
         else:
             return False
 
-    def create_child(self,Data,Uniq=0):
+    def create_child(self,Data,Uniq=0,Meta_data=None):
         if Uniq==1:
             if Data in self.list_child_name():
                 print("Error ,{0} appear more than one time".format(Data))
@@ -27,6 +28,7 @@ class tree(object):
         child_node.father=self
         child_node.data=Data
         child_node.child=[]
+        child_node.meta_data=Meta_data 
         self.child.append(child_node)
         return child_node
 
@@ -48,6 +50,7 @@ def syntax_analyzer(token_list,id_list):
         except:
             print("Error, No more token.")
             return 0
+    string_count=0
     id_type={}
     state=0
     error=0
@@ -94,9 +97,14 @@ def syntax_analyzer(token_list,id_list):
                 state=3
                 break
             elif token in STRUCTURE_WORD or token in id_type:
-                pass
+                try:
+                    Statement_Section in Program_Body.child
+                except:
+                    Statement_Section=Program_Body.create_child(Data="Statement_Section",Uniq=1)
+                state=5
+                break
             elif token=="}":
-                return parse_tree
+                return parse_tree,id_type
             else:
                 print("Error, expected } after all statement.")
                 return 0
@@ -148,10 +156,14 @@ def syntax_analyzer(token_list,id_list):
                                 v_id_data.create_child(Data=get_next_token(1)).create_child(Data=v_data.next_node().next_node().data)
                                 id_type[get_next_token(1)]=[v_data.data,v_id_data]
                             else:
-                                v_data.next_node().data=[v_data.next_node().data,get_next_token(1)]
+                                if type(v_data.next_node().data)!=list:
+                                    v_data.next_node().data=[v_data.next_node().data,get_next_token(1)]
+                                else:
+                                    v_data.next_node().data.append(get_next_token(1))
                                 id_type[get_next_token(1)]=[v_data.data,v_data]
                         else:
                             print("Error , undeclared data.")
+                            return 0
                     elif get_next_token(3).isdigit():
                         v_data=Data_Section.create_child(Data="int")
                         v_data.create_child(Data="v"+get_next_token(1)).create_child(Data=int(get_next_token(3)))
@@ -166,8 +178,9 @@ def syntax_analyzer(token_list,id_list):
                             v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3))
                             id_type[get_next_token(1)]=["char",v_data]
                         else:
+                            string_count+=1
                             v_data=Data_Section.create_child(Data="string")
-                            v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3))
+                            v_data.create_child(Data=get_next_token(1)).create_child(Data=get_next_token(3),Meta_data=string_count)#################This Line Not Finish.
                             id_type[get_next_token(1)]=["string",v_data]
                     if get_next_token(4)==";":
                         current_token_index+=5
@@ -192,5 +205,20 @@ def syntax_analyzer(token_list,id_list):
             else:
                 print("Error, expected an ID.")
                 pass
+        while state==5:
+            if token=="print":
+                if get_next_token(1)=="(":
+                    print_node=Statement_Section.create_child(Data="print")
+                    if get_next_token(2).isprintable():
+                        string_count+=1
+                        Data_Section.create_child(Data="char").create_child(Data=str(string_count))
+                    elif get_next_token(2) in id_type:
+                        pass
+                    else:
+                        print("Error, expected string,char or statment in print.")
+                else:
+                    print("Error, expected a ( .")
+
+                
 
 

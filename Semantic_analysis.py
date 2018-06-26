@@ -1,6 +1,5 @@
 from symbol_table import *
 def semantic_analyzer(parse_tree):
-    string_count=0
     with open('test.asm','w') as f:
         current_node=parse_tree
         while current_node.next_node()!=0:
@@ -48,14 +47,12 @@ def semantic_analyzer(parse_tree):
                     current_node=current_node.next_node()
                 else:
                     if type(current_node.next_node().data)!=list:
-                        string_count+=1
-                        EPILOGUE.append("  _S{0}\tDB\t {1},0\n".format(str(string_count).zfill(4),current_node.next_node().next_node().data))
-                        EPILOGUE.append("  {0}\t\tDD\t _S{1}\n".format(current_node.next_node().data,str(string_count).zfill(4)))
+                        EPILOGUE.append("  _S{0}\tDB\t {1},0\n".format(str(current_node.next_node().next_node().meta_data).zfill(4),current_node.next_node().next_node().data))
+                        EPILOGUE.append("  {0}\t\tDD\t _S{1}\n".format(current_node.next_node().data,str(current_node.next_node().next_node().meta_data).zfill(4)))
                     else:
-                        string_count+=1
-                        EPILOGUE.append("  _S{0}\tDB\t {1},0\n".format(str(string_count).zfill(4),current_node.next_node().next_node().data))
+                        EPILOGUE.append("  _S{0}\tDB\t {1},0\n".format(str(current_node.next_node().next_node().meta_data).zfill(4),current_node.next_node().next_node().data))
                         for i in current_node.next_node().data:
-                            EPILOGUE.append("  {0}\t\tDD\t _S{1}\n".format(i,str(string_count).zfill(4)))
+                            EPILOGUE.append("  {0}\t\tDD\t _S{1}\n".format(i,str(current_node.next_node().next_node().meta_data).zfill(4)))
                     current_node=current_node.next_node()
                     current_node=current_node.next_node()
 

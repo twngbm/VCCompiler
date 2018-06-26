@@ -35,14 +35,10 @@ if error==0:
         print("\n",i,end=" ")
     print("\n\nend of token list\n")
     print("id list:",id_list,"\n")
-
-    parse_tree=syntax_analyzer(token_list,id_list)
-
-    if type(parse_tree)==int:
-        print("Error, Syntax error")
-    else:
+    try:
+        parse_tree,id_type=syntax_analyzer(token_list,id_list)
         semantic_analyzer(parse_tree)
-        
-
+    except:
+        print("Error, Syntax error")
 time2=time.time()
 print("\nEnd Processing, waste",time2-time1,"\n")

@@ -18,14 +18,11 @@ main()
   //   SYMBOLIC CONSTANTS AND VARIABLES
   // ----------------------------------------------
 
-  bool   b1, b2;
-  const  vB1=TRUE, vB2=FALSE, vB3=vB1 ;
-  const  K1= 1,    K2 =121,   K3 = 12321;
-  int    M1,    JJK,     xyz;
-  char   char1, char2, char3, char4;
+
   const  msg1="Hello!";
-  const  chara='a',  charb='b',  charc='c';
-  string hmsg1, hmsg2; 
+  const mesg2=msg1;
+  string mesg3;
+
 
   // ----------------------------------------------
   //   PROCESSING STATEMENTS
