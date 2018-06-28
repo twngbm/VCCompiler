@@ -14,10 +14,7 @@
 */
 main()
 {
-const c=1,d='a',e="wwww";
-println("asd");
-println('z');
-println(c);
-println(d);
-println(e);
+const a=1;
+read(a);
+print(a);
 }

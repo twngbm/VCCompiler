@@ -68,7 +68,7 @@ def semantic_analyzer(parse_tree):
                         f.write("\t\tMOV\t\tEDX, OFFSET _S{0}\n".format(str(current_node.meta_data).zfill(4)))
                         f.write("\t\tcall\tWriteString\n")
                 elif current_node.next_node().data[0]=="char":
-                    f.write("\t\tMOV\t\tal, {0}\n".format(str(current_node.next_node().data[1].next_node().next_node().data)))
+                    f.write("\t\tMOV\t\tal, {0}\n".format(current_node.next_node().data[1].next_node().data))
                     f.write("\t\tcall\tWriteChar\n")
                 elif current_node.next_node().data[0]=="int":
                     f.write("\t\tMOV\t\tEAX, {0}\n".format(str(current_node.next_node().data[1].next_node().data)))
@@ -97,7 +97,14 @@ def semantic_analyzer(parse_tree):
                 if current_node.data=="println":
                     f.write("\t\tcall\tCrlf\n")    
                 current_node=current_node.next_node()
-
+            elif current_node.data=="read":
+                if current_node.next_node().data[0]=="char":
+                    f.write("\t\tcall\tReadchar\n")
+                    f.write("\t\tMOV\t\t{0}, al\n".format(current_node.next_node().data[1].next_node().data))
+                elif current_node.next_node().data[0]=="int":
+                    f.write("\t\tcall\tReadInt\n")
+                    f.write("\t\tMOV\t\t{0}, EAX\n".format(current_node.next_node().data[1].next_node().data))
+                current_node=current_node.next_node()
         for line in EPILOGUE:
             f.write(line)
 

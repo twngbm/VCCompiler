@@ -96,13 +96,24 @@ def syntax_analyzer(token_list,id_list):
                     Data_Section=Program_Body.create_child(Data="Data_Section",Uniq=1)
                 state=3
                 break
-            elif token in STRUCTURE_WORD or token in id_type:
+            elif token in STRUCTURE_WORD or token in id_list:
                 try:
                     Statement_Section in Program_Body.child
                 except:
                     Statement_Section=Program_Body.create_child(Data="Statement_Section",Uniq=1)
-                state=5
-                break
+                if token=="print" or token=="println":
+                    state=5
+                    break
+                elif token=="read":
+                    state=6
+                    break
+                elif token in id_list:
+                    if token in id_type:
+                        state=7
+                        break
+                    else:
+                        print("Error, use {0} before declare.".format(token))
+                        return 0
             elif token=="}":
                 return parse_tree,id_type
             else:
@@ -207,41 +218,57 @@ def syntax_analyzer(token_list,id_list):
                 print("Error, expected an ID.")
                 return 0
         while state==5:
-            if token=="print" or token=="println":
-                token_print=token
-                if get_next_token(1)=="(":
-                    if get_next_token(2)[0]=="'" or get_next_token(2)[0]=="\"":
-                        string_count+=1
-                        try:
-                            Data_Section in Program_Body.child
-                        except:
-                            Data_Section=Program_Body.create_child(Data="Data_Section")
-                        Data_Section.create_child(Data="string").create_child(Data=str(string_count),Meta_data="str_in_print").create_child(Data=str(get_next_token(2)))
-                        Statement_Section.create_child(Data=token_print,Meta_data=str(string_count)).create_child(Data="string")
-                        if get_next_token(3)==")" and get_next_token(4)==";":
-                            current_token_index+=5
-                            state=2
-                            break
-                        else:
-                            print("Error, expected ) or ; after print statement.")
-                            return 0           
-                    elif get_next_token(2) in id_list:
-                        Statement_Section.create_child(Data=token_print).create_child(Data=id_type[get_next_token(2)])
-                        if get_next_token(3)==")" and get_next_token(4)==";":
-                            current_token_index+=5
-                            state=2
-                            break
-                        else:
-                            print("Error, expected ) or ; after print statement.")
-                            return 0           
-                      
+            token_print=token
+            if get_next_token(1)=="(":
+                if get_next_token(2)[0]=="'" or get_next_token(2)[0]=="\"":
+                    string_count+=1
+                    try:
+                        Data_Section in Program_Body.child
+                    except:
+                        Data_Section=Program_Body.create_child(Data="Data_Section")
+                    Data_Section.create_child(Data="string").create_child(Data=str(string_count),Meta_data="str_in_print").create_child(Data=str(get_next_token(2)))
+                    Statement_Section.create_child(Data=token_print,Meta_data=str(string_count)).create_child(Data="string")
+                    if get_next_token(3)==")" and get_next_token(4)==";":
+                        current_token_index+=5
+                        state=2
+                        break
                     else:
-                        print("Error, expected string , char or string,char data type in print.")
-                        return 0
+                        print("Error, expected ) or ; after print statement.")
+                        return 0           
+                elif get_next_token(2) in id_list:
+                    Statement_Section.create_child(Data=token_print).create_child(Data=id_type[get_next_token(2)])
+                    if get_next_token(3)==")" and get_next_token(4)==";":
+                        current_token_index+=5
+                        state=2
+                        break
+                    else:
+                        print("Error, expected ) or ; after print statement.")
+                        return 0           
+                      
                 else:
-                    print("Error, expected a ( .")
+                    print("Error, expected string , char or string,char data type in print.")
                     return 0
-            
+            else:
+                print("Error, expected a ( .")
+                return 0
+        while state==6:
+            if get_next_token(1)=="(":
+                if get_next_token(2) in id_type:
+                    Statement_Section.create_child(Data="read").create_child(Data=id_type[get_next_token(2)])
+                    if get_next_token(3)==")" and get_next_token(4)==";":
+                        current_token_index+=5
+                        state=2
+                        break
+                    else:
+                        print("Error, ecpected ) or ; after read statement.")
+                else:
+                    print("Error, expected an ID.")
+            else:
+                print("Error, expected a ( .")
+                return 0
+        while state==7:
+            pass
+             
 
                 
 
