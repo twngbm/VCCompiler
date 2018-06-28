@@ -41,6 +41,9 @@ class tree(object):
                 if self.data=="root":
                     return 0
             return self.father.child[self.father.child.index(self)+1]
+    def add_child(self,child_node,position):
+        self.child.insert(position,child_node)
+        child_node.father=self
 
 
 def syntax_analyzer(token_list,id_list):
@@ -267,7 +270,44 @@ def syntax_analyzer(token_list,id_list):
                 print("Error, expected a ( .")
                 return 0
         while state==7:
-            pass
+            if get_next_token(1)=="=":
+                if id_type[token][0]=="string":
+                    current_token_index+=2
+                    state=71
+                    break
+                elif id_type[token][0]=="char":
+                    pass
+                elif id_type[token][0]=="bool":
+                    pass
+                elif id_type[token][0]=="int":
+                    pass
+                    if get_next_token(2)=="(":
+                        pass
+            elif get_next_token(1)==";":
+                current_token_index+=2
+                state=2
+                break
+            else:
+                print("Error, expected a =.")
+        while state==71:
+            token=token_list[current_token_index]
+            if token[0]=='"':
+                Statement_Section.create_child(Data=id_type[get_next_token(-2)][1],Meta_data="Left").create_child(Data=token,Meta_data="Right")
+            elif id_type[token][0]=="string":
+                Statement_Section.create_child(Data=id_type[get_next_token(-2)][1],Meta_data="Left").create_child(Data=id_type[token][1],Meta_data="Right")
+            elif token=="(":
+                print("Error, remove all ( and ) is string assign statement.")
+                return 0
+            else:
+                print("Error, expected a string ID or string.")
+                return 0
+            if get_next_token(1)==";":
+                current_token_index+=2
+                state=2
+                break
+            else:
+                print("Error, expected ; after statement end.")
+                return 0
              
 
                 

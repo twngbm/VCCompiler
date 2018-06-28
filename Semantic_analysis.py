@@ -1,5 +1,5 @@
 from symbol_table import *
-def semantic_analyzer(parse_tree):
+def semantic_analyzer(parse_tree,id_type):
     with open('test.asm','w') as f:
 
         current_node=parse_tree
@@ -12,6 +12,8 @@ def semantic_analyzer(parse_tree):
             elif current_node.data=="Program_Body":
                 continue
             elif current_node.data=="Data_Section":
+                continue
+            elif current_node.data=="Statement_Section":
                 continue
             elif current_node.data=="int":
                 if len(current_node.next_node().child)==0:
@@ -105,6 +107,13 @@ def semantic_analyzer(parse_tree):
                     f.write("\t\tcall\tReadInt\n")
                     f.write("\t\tMOV\t\t{0}, EAX\n".format(current_node.next_node().data[1].next_node().data))
                 current_node=current_node.next_node()
+            elif id_type[current_node.data][0]=="string":
+                if current_node.next_node().data[0]=='"':
+                    pass
+                else:
+                    f.write("\t\tMOV\t\t{0}, {1}".format(current_node.data.next_node().data,current_node.next_node().data))
+                    current_node=current_node.next_node()
+
         for line in EPILOGUE:
             f.write(line)
 

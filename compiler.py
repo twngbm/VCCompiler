@@ -38,7 +38,7 @@ if error==0:
     try:
         parse_tree,id_type=syntax_analyzer(token_list,id_list)
         try:
-            semantic_analyzer(parse_tree)
+            semantic_analyzer(parse_tree,id_type)
         except:
             print("Error, Semantic error.")
     except:
